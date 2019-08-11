@@ -4,9 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import app.com.CATE.fragments.ChannelFragment;
+import app.com.CATE.fragments.HomeFragment;
 import app.com.CATE.fragments.LiveFragment;
-import app.com.CATE.fragments.PlayListFragment;
+import app.com.CATE.fragments.SearchFragment;
 import app.com.CATE.fragments.CategoryFragment;
 
 /**
@@ -26,10 +26,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                ChannelFragment tab1 = new ChannelFragment();
+                HomeFragment tab1 = new HomeFragment();
                 return tab1;
             case 1:
-                PlayListFragment tab2 = new PlayListFragment();
+                SearchFragment tab2 = new SearchFragment();
                 return tab2;
             case 2:
                 LiveFragment tab3 = new LiveFragment();

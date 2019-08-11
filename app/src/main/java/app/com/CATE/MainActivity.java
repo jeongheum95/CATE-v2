@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         //setting the tabs title
-        tabLayout.addTab(tabLayout.newTab().setText("Channel"));
-        tabLayout.addTab(tabLayout.newTab().setText("PlayList"));
+        tabLayout.addTab(tabLayout.newTab().setText("Home"));
+        tabLayout.addTab(tabLayout.newTab().setText("Search"));
         tabLayout.addTab(tabLayout.newTab().setText("Live"));
         tabLayout.addTab(tabLayout.newTab().setText("Category"));
 

@@ -1,10 +1,12 @@
 package app.com.CATE.fragments;
 
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +49,7 @@ public class CategoryFragment extends ListFragment {
     private CategoryAdapter adapter = null;
     private List<CategoryModel> categoryList;
     private MainActivity mainActivity;
-
+    private SparseBooleanArray mSelectedItems=new SparseBooleanArray(0);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,7 +76,6 @@ public class CategoryFragment extends ListFragment {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 JsonObject jsonObject=response.body();
-                Toast.makeText(getContext(), response.body().toString(), Toast.LENGTH_SHORT).show();
                 try {
                     JsonArray jsonArray = jsonObject.get("response").getAsJsonArray();
                     int count = 0;
@@ -116,11 +117,16 @@ public class CategoryFragment extends ListFragment {
         CategoryModel item = (CategoryModel) l.getItemAtPosition(position);
         new PcOfSeat().execute(item.getDetail());
 
+        if(mSelectedItems.get(position,false)){
+            mSelectedItems.put(position,false);
+            v.setBackgroundColor(Color.TRANSPARENT);
+        }
+        else{
+            mSelectedItems.put(position,true);
+            v.setBackgroundColor(Color.LTGRAY);
+        }
+
         mainActivity.PLAYLIST_ID = item.getKey();
-        String titleStr = item.getName();
-        String descStr = item.getDetail();
-        String iconDrawable = item.getId();
-        String channelStr = item.getKey();
 
         // TODO : use item data.
     }

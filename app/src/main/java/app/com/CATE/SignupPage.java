@@ -1,13 +1,18 @@
 package app.com.CATE;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,6 +28,10 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import app.com.youtubeapiv3.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupPage extends Activity {
     private EditText editTextId;
@@ -65,11 +74,47 @@ public class SignupPage extends Activity {
         String Pw2 = editTextPw2.getText().toString();
         String Name = editTextName.getText().toString();
         if(Pw1.equalsIgnoreCase(Pw2)) {
-            insertoToDatabase(Id, Pw1,Name);
+            signup();
         }
         else{
             Toast.makeText(getApplicationContext(), "비번을 일치시켜라.", Toast.LENGTH_LONG).show();
         }
+    }
+
+        public void signup() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(RetrofitService.URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+
+        RetrofitService retrofitService = retrofit.create(RetrofitService.class);
+        Call<JsonObject> call = retrofitService.Signup(editTextId.getText().toString(),editTextPw1.getText().toString(),editTextName.getText().toString());
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
+                JsonObject jsonObject=response.body();
+                if(jsonObject.get("response").getAsString().equalsIgnoreCase("회원가입에 성공하셨습니다.")){
+                    Toast.makeText(SignupPage.this, jsonObject.get("response").getAsString(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SignupPage.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else{
+                    AlertDialog.Builder builder=new AlertDialog.Builder(SignupPage.this);
+                    builder.setMessage(jsonObject.get("response").getAsString())
+                            .setNegativeButton("retry",null)
+                            .create()
+                            .show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("Err", t.getMessage());
+            }
+        });
     }
     private void insertoToDatabase(String Id, String Pw,String Name) {
         class InsertData extends AsyncTask<String, Void, String> {
@@ -86,6 +131,7 @@ public class SignupPage extends Activity {
                // Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                 if(s.equalsIgnoreCase("회원가입에 성공하셨습니다.")){
                     Intent intent = new Intent(SignupPage.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     finish();
 

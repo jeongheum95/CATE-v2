@@ -66,8 +66,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent registerIntent = new Intent(LoginActivity.this, SignupPage.class);
-                LoginActivity.this.startActivity(registerIntent);
-                finish();
+                registerIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(registerIntent);
             }
         });
         btnLogout.setOnClickListener(new Button.OnClickListener() {

@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -132,7 +133,11 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
         final Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+
                 try {
+                    if (response.startsWith("ï»¿")) {
+                        response = response.substring(3);
+                    }
                     ArrayList<CommentModel> cListData = new ArrayList<>();
                     JSONArray jsonArray = new JSONArray(response);
                     for(int i=0; i<jsonArray.length(); i++) {
@@ -168,6 +173,9 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
                     @Override
                     public void onResponse(String response) {
                         try {
+                            if (response.startsWith("ï»¿")) {
+                                response = response.substring(3);
+                            }
                             ArrayList<CommentModel> cListData = new ArrayList<>();
                             JSONArray jsonArray = new JSONArray(response);
                             for(int i=0; i<jsonArray.length(); i++) {
