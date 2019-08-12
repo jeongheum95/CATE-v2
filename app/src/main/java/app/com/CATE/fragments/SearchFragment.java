@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ import app.com.CATE.adapters.HorizontalCategoryAdapter;
  * A simple {@link Fragment} subclass.
  */
 public class SearchFragment extends Fragment {
-
+SearchView searchview;
     //// private CategoryAdapter adapter = null;
 //// private ListView listView;
 //// private List<CategoryModel> categoryList;
@@ -41,6 +42,19 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+        searchview=(SearchView)view.findViewById(R.id.searching);
+        searchview.setSubmitButtonEnabled(true);
+        searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String target) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                return false;
+            }
+        });
 //
 //
 // // Adapter 생성 및 Adapter 지정.

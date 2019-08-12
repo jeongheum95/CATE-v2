@@ -28,7 +28,7 @@ public class AddDialog extends Dialog implements View.OnClickListener{
     private TextInputEditText titleEt;
     private TextInputEditText urlEt;
     private TextInputEditText tagEt;
-    private String kind_video;
+    private String kind_video,kind_thumbnail;
     private Button twitchRb;
     private Button youtubeRb;
     private Button confirmBt;
@@ -148,13 +148,14 @@ public class AddDialog extends Dialog implements View.OnClickListener{
                     }
                 };
                 VideoChugaRequest VideoChugaRequest = new VideoChugaRequest(titleEt.getText().toString(), urlEt.getText().toString(),
-                        tagEt.getText().toString(),kind_video,MainActivity.strId, responseListener);
+                        tagEt.getText().toString(), kind_video, MainActivity.strId, kind_thumbnail, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(context);
                 queue.add(VideoChugaRequest);
                 cancel();
                 break;
             case R.id.radioButton_youtube :
                 kind_video = "YOUTUBE";
+                kind_thumbnail="https://i.ytimg.com/vi/" +urlEt.getText().toString().substring(urlEt.getText().toString().indexOf("=") + 1)+ "/hqdefault.jpg";
               //  Toast.makeText(context,kind_video,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.radioButton_twitch :

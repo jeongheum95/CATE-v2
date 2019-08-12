@@ -15,7 +15,7 @@ public class VideoChugaRequest extends StringRequest {
     private Map<String, String> parameters;
 
     //생성자
-    public VideoChugaRequest(String title, String url,String video_tag,String videokind,String userid, Response.Listener<String> listener){
+    public VideoChugaRequest(String title, String url,String video_tag,String videokind,String userid,String video_thumbnail, Response.Listener<String> listener){
         super(Method.POST, URL, listener, null);
         parameters = new HashMap<>();
         parameters.put("title", title);
@@ -23,6 +23,7 @@ public class VideoChugaRequest extends StringRequest {
         parameters.put("tag", video_tag);
         parameters.put("Kind", videokind);
         parameters.put("userid", userid);
+        parameters.put("video_thumbnail", video_thumbnail);
     }
 
     //추후 사용을 위한 부분
