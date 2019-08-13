@@ -146,6 +146,7 @@
     <orderEntry type="library" name="Gradle: com.squareup.okhttp:okhttp:2.3.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource:2.2.2@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.squareup:javawriter:2.1.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\CATE_up\CATE-FINAL2\CATE-FINAL2\app\libs\YouTubeAndroidPlayerApi.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-fragment:27.0.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:rules:0.5@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.kakao.sdk:util:1.19.0@aar" level="project" />
@@ -174,6 +175,5 @@
     <orderEntry type="library" name="Gradle: org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.kakao.sdk:usermgmt:1.19.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:C.\Users\dkss7\AndroidStudioProjects\CATE-FINAL-master1\app\libs\YouTubeAndroidPlayerApi.jar:unspecified@jar" level="project" />
   </component>
 </module>

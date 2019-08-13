@@ -21,8 +21,13 @@ public interface RetrofitService {
     @POST("fow_tag.php")
     Call<JsonObject> all_category(
             @Field("Id") String Id
-            );
+    );
 
+    @FormUrlEncoded
+    @POST("fow_allvideo.php")
+    Call<JsonObject> All_video(
+            @Field("Id") String Id
+    );
     @FormUrlEncoded
     @POST("fow_post.php")
     Call<JsonObject> Signup(
