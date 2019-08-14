@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
         listview2 = (RecyclerView)view.findViewById(R.id.mList_horizontal_category);
         initList(nListData);
 
-        userID = mainActivity.strId;
+        userID = mainActivity.strName;
 
         if (!mListData.isEmpty()) {
             for (int i = 0; i < mListData.size(); i++) {

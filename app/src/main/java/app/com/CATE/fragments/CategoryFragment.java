@@ -71,7 +71,7 @@ public class CategoryFragment extends ListFragment {
                 .build();
 
         RetrofitService retrofitService=retrofit.create(RetrofitService.class);
-        Call<JsonObject> call=retrofitService.all_category(MainActivity.strId);
+        Call<JsonObject> call=retrofitService.all_category(MainActivity.strName);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {

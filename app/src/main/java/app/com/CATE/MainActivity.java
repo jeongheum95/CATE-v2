@@ -20,7 +20,7 @@ import app.com.CATE.models.YoutubeDataModel;
 import app.com.youtubeapiv3.R;
 
 public class MainActivity extends AppCompatActivity {
-    public static String strId;
+    public static String strName;
     private TabLayout tabLayout = null;
     private ViewPager viewPager = null;
     private Toolbar toolbar = null;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
         category = intent.getStringExtra("Category");
-        strId = intent.getStringExtra("userID");
+        strName = intent.getStringExtra("userName");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();

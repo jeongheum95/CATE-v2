@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +30,8 @@ import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,15 +62,18 @@ import app.com.youtubeapiv3.R;
 import app.com.CATE.adapters.CommentAdapter;
 import at.huber.youtubeExtractor.YouTubeUriExtractor;
 import at.huber.youtubeExtractor.YtFile;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
     private static final int READ_STORAGE_PERMISSION_REQUEST_CODE = 1;
     private static String GOOGLE_YOUTUBE_API = "AIzaSyBH8szUCt1ctKQabVeQuvWgowaKxHVjn8E";
     private YoutubeDataModel youtubeDataModel = null;
-    TextView textViewName;
-//    TextView textViewDes;
-//    TextView textViewDate;
-    // ImageView imageViewIcon;
+    TextView textViewName,countLike,countDisLike;
+    ImageView imageButtonLike,imageButtonDisLike;
+
     public static final String VIDEO_ID = "c2UNv38V6y4";
     private YouTubePlayerView mYoutubePlayerView = null;
     private YouTubePlayer mYoutubePlayer = null;
@@ -74,9 +81,8 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
     private CommentAdapter mAdapter = null;
     private RecyclerView mList_videos = null;
     ListView listview;
-    int size, video_index;
-    String userID = "";
-
+    int size, video_index,u_v_status,likes,dislikes;
+    String userName = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,23 +90,101 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
         youtubeDataModel = getIntent().getParcelableExtra(YoutubeDataModel.class.toString());
         Log.e("", youtubeDataModel.getDescription());
         Intent intent = getIntent();
-        userID = intent.getStringExtra("userID");
+        userName = intent.getStringExtra("userName");
         video_index = intent.getIntExtra("video_index", 0);
+        u_v_status = intent.getIntExtra("u_v_status",0);
+        likes = intent.getIntExtra("likes",0);
+        dislikes = intent.getIntExtra("dislikes",0);
 
         mYoutubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player);
         mYoutubePlayerView.initialize(GOOGLE_YOUTUBE_API, this);
 
         textViewName = (TextView) findViewById(R.id.textViewName);
-//        textViewDes = (TextView) findViewById(R.id.textViewDes);
-//        imageViewIcon = (ImageView) findViewById(R.id.imageView);
-//        textViewDate = (TextView) findViewById(R.id.textViewDate);
 
         textViewName.setText(youtubeDataModel.getTitle());
-//        textViewDes.setText(youtubeDataModel.getDescription());
-//        textViewDate.setText(youtubeDataModel.getPublishedAt());
 
         mList_videos = (RecyclerView) findViewById(R.id.mList_videos);
         listview = (ListView) findViewById(R.id.commentList);
+
+        imageButtonLike=findViewById(R.id.imageButtonLike);
+        imageButtonDisLike=findViewById(R.id.imageButtonDisLike);
+
+        if(u_v_status==1){
+            imageButtonLike.setImageResource(R.drawable.ic_thumb_up_selected);
+            imageButtonLike.setTag(R.drawable.ic_thumb_up_selected);
+            imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down);
+            imageButtonDisLike.setTag(R.drawable.ic_thumb_down);
+        }else if(u_v_status==2){
+            imageButtonLike.setImageResource(R.drawable.ic_thumb_up);
+            imageButtonLike.setTag(R.drawable.ic_thumb_up);
+            imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down_selected);
+            imageButtonDisLike.setTag(R.drawable.ic_thumb_down_selected);
+        }else{
+            imageButtonLike.setImageResource(R.drawable.ic_thumb_up);
+            imageButtonLike.setTag(R.drawable.ic_thumb_up);
+            imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down);
+            imageButtonDisLike.setTag(R.drawable.ic_thumb_down);
+        }
+
+        countLike=findViewById(R.id.countLike);
+        countDisLike=findViewById(R.id.countDisLike);
+
+        countLike.setText(String.valueOf(likes));
+        countDisLike.setText(String.valueOf(dislikes));
+        imageButtonLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if ( imageButtonLike.getTag().equals(R.drawable.ic_thumb_up_selected)) {     //좋아요 취소
+                    update_likes(5);
+                    imageButtonLike.setImageResource(R.drawable.ic_thumb_up);
+                    imageButtonLike.setTag(R.drawable.ic_thumb_up);
+                    countLike.setText(String.valueOf(Integer.parseInt(countLike.getText().toString()) - 1));
+                }
+                else if(imageButtonLike.getTag().equals(R.drawable.ic_thumb_up) &&imageButtonDisLike.getTag().equals(R.drawable.ic_thumb_down_selected)){
+                    update_likes(3);
+                    imageButtonLike.setImageResource(R.drawable.ic_thumb_up_selected);
+                    countLike.setText(String.valueOf(Integer.parseInt(countLike.getText().toString())+1));
+                    imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down);
+                    countDisLike.setText(String.valueOf(Integer.parseInt(countDisLike.getText().toString())-1));
+                    imageButtonLike.setTag(R.drawable.ic_thumb_up_selected);
+                    imageButtonDisLike.setTag(R.drawable.ic_thumb_down);
+                }
+                else{
+                    update_likes(1);
+                    imageButtonLike.setImageResource(R.drawable.ic_thumb_up_selected);      //좋아요 누르기
+                    imageButtonLike.setTag(R.drawable.ic_thumb_up_selected);
+                    countLike.setText(String.valueOf(Integer.parseInt(countLike.getText().toString())+1));
+                }
+            }
+        });
+        imageButtonDisLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if ( imageButtonDisLike.getTag().equals(R.drawable.ic_thumb_down_selected) ){    //싫어요 취소
+                    update_likes(6);
+                    imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down);
+                    imageButtonDisLike.setTag(R.drawable.ic_thumb_down);
+                    countDisLike.setText(String.valueOf(Integer.parseInt(countDisLike.getText().toString())-1));
+                }
+                else if(imageButtonDisLike.getTag().equals(R.drawable.ic_thumb_down) &&imageButtonLike.getTag().equals(R.drawable.ic_thumb_up_selected)){
+                    update_likes(4);
+                    imageButtonLike.setImageResource(R.drawable.ic_thumb_up);
+                    countLike.setText(String.valueOf(Integer.parseInt(countLike.getText().toString()) - 1));
+                    imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down_selected);
+                    countDisLike.setText(String.valueOf(Integer.parseInt(countDisLike.getText().toString())+1));
+                    imageButtonLike.setTag(R.drawable.ic_thumb_up);
+                    imageButtonDisLike.setTag(R.drawable.ic_thumb_down_selected);
+                }
+                else{             //i가 1일때 싫어요 클릭이 안된 상태
+                    update_likes(2);
+                    imageButtonDisLike.setImageResource(R.drawable.ic_thumb_down_selected);      //싫어요 누르기
+                    imageButtonDisLike.setTag(R.drawable.ic_thumb_down_selected);
+                    countDisLike.setText(String.valueOf(Integer.parseInt(countDisLike.getText().toString())+1));
+                }
+            }
+        });
 
 //        new RequestYoutubeCommentAPI().execute();
 //        try {
@@ -196,7 +280,7 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
                         }
                     }
                 };
-                CommentInsertRequest commentInsertRequest = new CommentInsertRequest(video_index, size+1, userID, desc, responseListener1);
+                CommentInsertRequest commentInsertRequest = new CommentInsertRequest(video_index, size+1, userName, desc, responseListener1);
                 RequestQueue queue = Volley.newRequestQueue(DetailsActivity.this);
                 queue.add(commentInsertRequest);
 
@@ -205,6 +289,26 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
         });
     }
 
+    public void update_likes(final int target){
+        Retrofit retrofit=new Retrofit.Builder()
+                .baseUrl(RetrofitService.URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitService retrofitService=retrofit.create(RetrofitService.class);
+        Call<JsonObject> call=retrofitService.updatelikes(userName,String.valueOf(video_index),String.valueOf(target));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
+                Toast.makeText(DetailsActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("Err", t.getMessage());
+            }
+        });
+    }
     public void back_btn_pressed(View view) {
         finish();
     }

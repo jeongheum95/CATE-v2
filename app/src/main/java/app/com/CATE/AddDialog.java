@@ -139,7 +139,7 @@ public class AddDialog extends Dialog implements View.OnClickListener {
 //                        }
 //                    }
 //                };
-//                ChargeRequest ChargeRequest = new ChargeRequest(strId, chargeMoney, responseListener);
+//                ChargeRequest ChargeRequest = new ChargeRequest(strName, chargeMoney, responseListener);
 //                RequestQueue queue = Volley.newRequestQueue(ChargeActivity.this);
 //                queue.add(ChargeRequest);
 
@@ -184,7 +184,7 @@ public class AddDialog extends Dialog implements View.OnClickListener {
                     kind_thumbnail = "https://i.ytimg.com/vi/" + urlEt.getText().toString().substring(urlEt.getText().toString().indexOf("=") + 1) + "/hqdefault.jpg";
 
                     VideoChugaRequest VideoChugaRequest = new VideoChugaRequest(titleEt.getText().toString(), urlEt.getText().toString(),
-                            tagEt.getText().toString(), kind_video, MainActivity.strId, kind_thumbnail, responseListener);
+                            tagEt.getText().toString(), kind_video, MainActivity.strName, kind_thumbnail, responseListener);
                     RequestQueue queue = Volley.newRequestQueue(context);
                     queue.add(VideoChugaRequest);
                     cancel();
@@ -225,7 +225,7 @@ public class AddDialog extends Dialog implements View.OnClickListener {
                     @Override
                     public void handleMessage(Message msg) {
                         VideoChugaRequest VideoChugaRequest = new VideoChugaRequest(titleEt.getText().toString(), urlEt.getText().toString(),
-                                tagEt.getText().toString(), kind_video, MainActivity.strId, kind_thumbnail, responseListener);
+                                tagEt.getText().toString(), kind_video, MainActivity.strName, kind_thumbnail, responseListener);
                         RequestQueue queue = Volley.newRequestQueue(context);
                         queue.add(VideoChugaRequest);
                         cancel();

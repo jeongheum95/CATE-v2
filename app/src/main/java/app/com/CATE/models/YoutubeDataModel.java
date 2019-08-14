@@ -15,6 +15,10 @@ public class YoutubeDataModel implements Parcelable {
     private String video_id = "";
     private String video_kind = "";
     private int video_index;
+    private int likes;
+    private int dislikes;
+
+
 
     public String getVideo_id() {
         return video_id;
@@ -68,7 +72,22 @@ public class YoutubeDataModel implements Parcelable {
 
     public void setVideo_index(int video_index) {this.video_index = video_index;}
 
-    public YoutubeDataModel(String title, String description, String publishedAt, String thumbnail,String video_id, String video_kind, int video_index) {
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+    public YoutubeDataModel(String title, String description, String publishedAt, String thumbnail,String video_id, String video_kind, int video_index, int likes, int dislikes) {
         this.title = title;
         this.description = description;
         this.publishedAt = publishedAt;
@@ -76,6 +95,8 @@ public class YoutubeDataModel implements Parcelable {
         this.video_id = video_id;
         this.video_kind = video_kind;
         this.video_index = video_index;
+        this.likes = likes;
+        this.dislikes = dislikes;
     }
 
     @Override

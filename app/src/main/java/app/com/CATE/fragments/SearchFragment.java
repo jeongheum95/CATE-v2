@@ -62,9 +62,6 @@ public class SearchFragment extends Fragment {
     private VideoPostAdapter adapter = null;
     ArrayList<YoutubeDataModel> listData = new ArrayList<>();
     private ProgressBar progressBar;
-    //// private CategoryAdapter adapter = null;
-//// private ListView listView;
-//// private List<CategoryModel> categoryList;
     private MainActivity mainActivity;
     //
 //
@@ -73,6 +70,20 @@ public class SearchFragment extends Fragment {
 // super.onActivityCreated(savedInstanceState);
 // LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,true);
 // }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Toast.makeText(mainActivity, "onstart", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(mainActivity, "onresume", Toast.LENGTH_SHORT).show();
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -174,18 +185,40 @@ public class SearchFragment extends Fragment {
         adapter = new VideoPostAdapter(getActivity(), mListData, new OnItemClickListener() {
             @Override
             public void onItemClick(YoutubeDataModel item) {
-                YoutubeDataModel youtubeDataModel = item;
+                final YoutubeDataModel youtubeDataModel = item;
                 if (youtubeDataModel.getVideo_kind().equals("YOUTUBE")) { //유튜브 플레이어
-                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                    intent.putExtra(YoutubeDataModel.class.toString(), youtubeDataModel);
-                    intent.putExtra("userID", MainActivity.strId);
-                    intent.putExtra("video_index", youtubeDataModel.getVideo_index());
-                    startActivity(intent);
+                    Retrofit retrofit=new Retrofit.Builder()
+                            .baseUrl(RetrofitService.URL)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    RetrofitService retrofitService=retrofit.create(RetrofitService.class);
+                    Call<JsonObject> call=retrofitService.MakeLikeTable(MainActivity.strName,youtubeDataModel.getVideo_index());
+                    call.enqueue(new Callback<JsonObject>() {
+                        @Override
+                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                            JsonObject jsonObject=response.body();
+                            Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                            intent.putExtra(YoutubeDataModel.class.toString(), youtubeDataModel);
+                            intent.putExtra("userName", MainActivity.strName);
+                            intent.putExtra("video_index", youtubeDataModel.getVideo_index());
+                            intent.putExtra("u_v_status", jsonObject.get("status").getAsInt());
+                            Toast.makeText(getContext(), "like :"+youtubeDataModel.getLikes()+"dis:"+youtubeDataModel.getDislikes(), Toast.LENGTH_SHORT).show();
+                            intent.putExtra("likes", jsonObject.get("likes").getAsInt());
+                            intent.putExtra("dislikes", jsonObject.get("dislikes").getAsInt());
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onFailure(Call<JsonObject> call, Throwable t) {
+
+                        }
+                    });
+
                 }
                 if (youtubeDataModel.getVideo_kind().equals("TWITCH")) {
                     Intent intent = new Intent(getActivity(), TwitchActivity.class); //트위치 플레이어
                     intent.putExtra(YoutubeDataModel.class.toString(), youtubeDataModel);
-                    intent.putExtra("userID", MainActivity.strId);
+                    intent.putExtra("userName", MainActivity.strName);
                     intent.putExtra("video_index", youtubeDataModel.getVideo_index());
                     startActivity(intent);
                 }
@@ -203,7 +236,7 @@ public class SearchFragment extends Fragment {
                 .build();
 
         RetrofitService retrofitService=retrofit.create(RetrofitService.class);
-        Call<JsonObject> call=retrofitService.All_video(MainActivity.strId);
+        Call<JsonObject> call=retrofitService.All_video(MainActivity.strName);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -222,12 +255,14 @@ public class SearchFragment extends Fragment {
                         String thumbnail = "";
                         String video_id = "";
                         String cateName, video_kind, cateDetail;
-                        int video_index;
+                        int video_index,likes,dislikes;
 
                         cateName = object.get("title").getAsString();
                         video_kind = object.get("kind").getAsString();
                         cateDetail = object.get("url").getAsString();
                         video_index = Integer.parseInt(object.get("id").getAsString());
+                        likes = Integer.parseInt(object.get("likes").getAsString());
+                        dislikes = Integer.parseInt(object.get("dislikes").getAsString());
 
                         if (video_kind.equals("YOUTUBE")) {
                             video_id = cateDetail.substring(cateDetail.indexOf("=") + 1);
@@ -244,6 +279,8 @@ public class SearchFragment extends Fragment {
                         youtubeObject.setThumbnail(thumbnail);
                         youtubeObject.setVideo_id(video_id);
                         youtubeObject.setVideo_kind(video_kind);
+                        youtubeObject.setLikes(likes);
+                        youtubeObject.setDislikes(dislikes);
 
                         count++;
                         listData.add(youtubeObject);
@@ -268,7 +305,7 @@ public class SearchFragment extends Fragment {
                 .build();
 
         RetrofitService retrofitService=retrofit.create(RetrofitService.class);
-        Call<JsonObject> call=retrofitService.All_video(MainActivity.strId);
+        Call<JsonObject> call=retrofitService.All_video(MainActivity.strName);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -287,28 +324,33 @@ public class SearchFragment extends Fragment {
                         String thumbnail = "";
                         String video_id = "";
                         String cateName, video_kind, cateDetail;
-                        int video_index;
+                        int video_index,likes,dislikes;
 
                         cateName = object.get("title").getAsString();
                         video_kind = object.get("kind").getAsString();
                         cateDetail = object.get("url").getAsString();
+                        thumbnail = object.get("thumbnail").getAsString();
                         video_index = Integer.parseInt(object.get("id").getAsString());
+                        likes = Integer.parseInt(object.get("likes").getAsString());
+                        dislikes = Integer.parseInt(object.get("dislikes").getAsString());
 
-                        if (video_kind.equals("YOUTUBE")) {
-                            video_id = cateDetail.substring(cateDetail.indexOf("=") + 1);
-                            thumbnail = "https://i.ytimg.com/vi/" + video_id + "/hqdefault.jpg";
-                        }
-                        if (video_kind.equals("TWITCH")) {
-                            String[] split = cateDetail.split("/");
-//                            video_id = split[4];
-                            thumbnail = "https://static-cdn.jtvnw.net/jtv_user_pictures/twitch-profile_image-8a8c5be2e3b64a9a-300x300.png";
-                        }
+//                        if (video_kind.equals("YOUTUBE")) {
+//                            video_id = cateDetail.substring(cateDetail.indexOf("=") + 1);
+//                            thumbnail = "https://i.ytimg.com/vi/" + video_id + "/hqdefault.jpg";
+//                        }
+//                        if (video_kind.equals("TWITCH")) {
+//                            String[] split = cateDetail.split("/");
+////                            video_id = split[4];
+//                            thumbnail = "https://static-cdn.jtvnw.net/jtv_user_pictures/twitch-profile_image-8a8c5be2e3b64a9a-300x300.png";
+//                        }
 
                         youtubeObject.setVideo_index(video_index);
                         youtubeObject.setTitle(cateName);
                         youtubeObject.setThumbnail(thumbnail);
                         youtubeObject.setVideo_id(video_id);
                         youtubeObject.setVideo_kind(video_kind);
+                        youtubeObject.setLikes(likes);
+                        youtubeObject.setDislikes(dislikes);
 
                         count++;
                         listData.add(youtubeObject);
