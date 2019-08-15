@@ -71,18 +71,6 @@ public class SearchFragment extends Fragment {
 // LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,true);
 // }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Toast.makeText(mainActivity, "onstart", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Toast.makeText(mainActivity, "onresume", Toast.LENGTH_SHORT).show();
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

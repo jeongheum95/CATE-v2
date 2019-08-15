@@ -1,6 +1,7 @@
 package app.com.CATE;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
@@ -104,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_logout:// 로그아웃 버튼
                 Snackbar.make(toolbar, "Logout menu pressed", Snackbar.LENGTH_SHORT).show();
+                SharedPreferences.Editor editor=LoginActivity.loginInformation.edit();
+                editor.clear();
+                editor.commit();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

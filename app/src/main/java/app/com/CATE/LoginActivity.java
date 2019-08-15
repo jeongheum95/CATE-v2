@@ -1,6 +1,7 @@
 package app.com.CATE;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,12 +46,14 @@ public class LoginActivity extends AppCompatActivity {
     public static EditText idText;
     public static EditText passwordText;
     private SessionCallback sessionCallback;
+    public static SharedPreferences loginInformation; //자동로그인 추가
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mContext = this;
 
+        loginInformation =getSharedPreferences("setting",0);
         sessionCallback = new SessionCallback(); //SessionCallback 초기화
         Session.getCurrentSession().addCallback(sessionCallback); //현재 세션에 콜백 붙임
 //        Session.getCurrentSession().checkAndImplicitOpen(); //자동 로그인
@@ -61,6 +64,10 @@ public class LoginActivity extends AppCompatActivity {
         BtnSignUp = (Button) findViewById(R.id.btn_signup);
         btnLogout=(Button) findViewById(R.id.btnLogout);
         checkBox=findViewById(R.id.check);
+
+        if(!loginInformation.getString("id","").equalsIgnoreCase("")){
+            LoginReq(loginInformation.getString("id",null),loginInformation.getString("password",null));
+        }
 
         BtnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,13 +95,13 @@ public class LoginActivity extends AppCompatActivity {
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginReq();
+                LoginReq(idText.getText().toString(),passwordText.getText().toString());
             }
         });
 
     }
 
-    public void LoginReq() {
+    public void LoginReq(final String id,final String password) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(RetrofitService.URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -102,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         RetrofitService retrofitService = retrofit.create(RetrofitService.class);
-        Call<JsonObject> call = retrofitService.Login_cate(idText.getText().toString(),passwordText.getText().toString());
+        Call<JsonObject> call = retrofitService.Login_cate(id,password);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
@@ -113,7 +120,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(getApplicationContext(), "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
 
-
+                    SharedPreferences.Editor editor= loginInformation.edit();
+                    editor.putString("id", id);
+                    editor.commit();
                     String userID = jsonObject.get("userID").getAsString();
                     String userName = jsonObject.get("userName").getAsString();
                     String Api = jsonObject.get("Api").getAsString();
