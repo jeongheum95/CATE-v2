@@ -40,20 +40,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class LoginActivity extends AppCompatActivity {
 
     Button BtnSignUp,btnLogout;
-    CheckBox checkBox;
+    CheckBox AutoLogincheck;
     String finalresult;
     public static Context mContext;
     public static EditText idText;
     public static EditText passwordText;
     private SessionCallback sessionCallback;
     public static SharedPreferences loginInformation; //자동로그인 추가
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mContext = this;
 
-        loginInformation =getSharedPreferences("setting",0);
+        loginInformation =getSharedPreferences("setting",MODE_PRIVATE);
         sessionCallback = new SessionCallback(); //SessionCallback 초기화
         Session.getCurrentSession().addCallback(sessionCallback); //현재 세션에 콜백 붙임
 //        Session.getCurrentSession().checkAndImplicitOpen(); //자동 로그인
@@ -63,8 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginbtn = (Button) findViewById(R.id.loginbtn);
         BtnSignUp = (Button) findViewById(R.id.btn_signup);
         btnLogout=(Button) findViewById(R.id.btnLogout);
-        checkBox=findViewById(R.id.check);
-
+        AutoLogincheck=findViewById(R.id.AutoLogincheck);
         if(!loginInformation.getString("id","").equalsIgnoreCase("")){
             LoginReq(loginInformation.getString("id",null),loginInformation.getString("password",null));
         }
@@ -119,10 +119,12 @@ public class LoginActivity extends AppCompatActivity {
                 if (success) {
 
                     Toast.makeText(getApplicationContext(), "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show();
-
-                    SharedPreferences.Editor editor= loginInformation.edit();
-                    editor.putString("id", id);
-                    editor.commit();
+                    if(AutoLogincheck.isChecked()) {
+                        SharedPreferences.Editor editor = loginInformation.edit();
+                        editor.putString("id", id);
+                        editor.putString("password", password);
+                        editor.commit();
+                    }
                     String userID = jsonObject.get("userID").getAsString();
                     String userName = jsonObject.get("userName").getAsString();
                     String Api = jsonObject.get("Api").getAsString();

@@ -5,13 +5,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -30,18 +28,11 @@ import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,16 +41,17 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-import app.com.CATE.adapters.Comment1Adapter;
+import app.com.CATE.adapters.CommentAdapter;
 import app.com.CATE.models.CommentModel;
 import app.com.CATE.models.YoutubeCommentModel;
 import app.com.CATE.models.YoutubeDataModel;
 import app.com.CATE.requests.CommentInsertRequest;
 import app.com.CATE.requests.CommentRequest;
 import app.com.youtubeapiv3.R;
-import app.com.CATE.adapters.CommentAdapter;
 import at.huber.youtubeExtractor.YouTubeUriExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import retrofit2.Call;
@@ -78,11 +70,11 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
     private YouTubePlayerView mYoutubePlayerView = null;
     private YouTubePlayer mYoutubePlayer = null;
     private ArrayList<YoutubeCommentModel> mListData = new ArrayList<>();
-    private CommentAdapter mAdapter = null;
     private RecyclerView mList_videos = null;
     ListView listview;
-    int size, video_index,u_v_status,likes,dislikes;
-    String userName = "";
+    public static int video_index;
+    int size, u_v_status,likes,dislikes;
+    public static String userName = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +93,12 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
 
         textViewName = (TextView) findViewById(R.id.textViewName);
 
+        TextView ss=findViewById(R.id.textViewDate);
+        SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd HH:mm");
+        Date time = new Date();
+
+        String time1 = format1.format(time);
+        ss.setText(time1);
         textViewName.setText(youtubeDataModel.getTitle());
 
         mList_videos = (RecyclerView) findViewById(R.id.mList_videos);
@@ -186,18 +184,6 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
             }
         });
 
-//        new RequestYoutubeCommentAPI().execute();
-//        try {
-//            if (youtubeDataModel.getThumbnail() != null) {
-//                if (youtubeDataModel.getThumbnail().startsWith("http")) {
-//                    Picasso.with(this)
-//                            .load(youtubeDataModel.getThumbnail())
-//                            .into(imageViewIcon);
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         if (!checkPermissionForReadExtertalStorage()) {
             try {
@@ -207,9 +193,7 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
             }
         }
 
-        //댓글 기능
-        Comment1Adapter adapter = new Comment1Adapter();
-        listview.setAdapter(adapter);
+
 
         final EditText descText = (EditText) findViewById(R.id.descText);
         Button insertButton = (Button) findViewById(R.id.insertButton);
@@ -227,15 +211,20 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
                     for(int i=0; i<jsonArray.length(); i++) {
                         JSONObject commentObject = jsonArray.getJSONObject(i);
                         String author = commentObject.getString("author");
+                        String _index = commentObject.getString("_index");
                         String desc = commentObject.getString("desc");
+                        String writetime = commentObject.getString("writetime");
+                        String commentLike = commentObject.getString("commentLike");
+                        String commentDisLike = commentObject.getString("commentDisLike");
+                        String status = commentObject.getString("status");
 
-                        CommentModel commentModel = new CommentModel(author, desc);
+                        CommentModel commentModel = new CommentModel(author,_index, desc,writetime,commentLike,commentDisLike,status);
                         cListData.add(commentModel);
                     }
                     if(cListData.isEmpty()) size = 0;
                     else size = cListData.size();
 
-                    Comment1Adapter adapter = new Comment1Adapter(cListData);
+                    CommentAdapter adapter = new CommentAdapter(cListData);
                     listview.setAdapter(adapter);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -243,7 +232,7 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
             }
         };
 
-        final CommentRequest commentRequest = new CommentRequest(video_index, responseListener);
+        final CommentRequest commentRequest = new CommentRequest(video_index, userName,responseListener);
         RequestQueue queue = Volley.newRequestQueue(DetailsActivity.this);
         queue.add(commentRequest);
 
@@ -265,22 +254,27 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
                             for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject commentObject = jsonArray.getJSONObject(i);
                                 String author = commentObject.getString("author");
+                                String _index = commentObject.getString("_index");
                                 String desc = commentObject.getString("desc");
+                                String writetime = commentObject.getString("writetime");
+                                String commentLike = commentObject.getString("commentLike");
+                                String commentDisLike = commentObject.getString("commentDisLike");
+                                String status = commentObject.getString("status");
 
-                                CommentModel commentModel = new CommentModel(author, desc);
+                                CommentModel commentModel = new CommentModel(author,_index, desc,writetime,commentLike,commentDisLike,status);
                                 cListData.add(commentModel);
                             }
                             if(cListData.isEmpty()) size = 0;
                             else size = cListData.size();
 
-                            Comment1Adapter adapter = new Comment1Adapter(cListData);
+                            CommentAdapter adapter = new CommentAdapter(cListData);
                             listview.setAdapter(adapter);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 };
-                CommentInsertRequest commentInsertRequest = new CommentInsertRequest(video_index, size+1, userName, desc, responseListener1);
+                CommentInsertRequest commentInsertRequest = new CommentInsertRequest(video_index, size+1, userName, desc,userName, responseListener1);
                 RequestQueue queue = Volley.newRequestQueue(DetailsActivity.this);
                 queue.add(commentInsertRequest);
 
@@ -313,14 +307,6 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
         finish();
     }
 
-//    public void playVideo(View view) {
-//        if (mYoutubePlayer != null) {
-//            if (mYoutubePlayer.isPlaying())
-//                mYoutubePlayer.pause();
-//            else
-//                mYoutubePlayer.play();
-//        }
-//    }
 
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
@@ -527,84 +513,6 @@ public class DetailsActivity extends YouTubeBaseActivity implements YouTubePlaye
     }
 
 
-    private class RequestYoutubeCommentAPI extends AsyncTask<Void, String, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String VIDEO_COMMENT_URL = "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&videoId=" + youtubeDataModel.getVideo_id() + "&key=" + GOOGLE_YOUTUBE_API;
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(VIDEO_COMMENT_URL);
-            Log.e("url: ", VIDEO_COMMENT_URL);
-            try {
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity httpEntity = response.getEntity();
-                String json = EntityUtils.toString(httpEntity);
-                return json;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            super.onPostExecute(response);
-            if (response != null) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    Log.e("response", jsonObject.toString());
-                    mListData = parseJson(jsonObject);
-                    initVideoList(mListData);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public void initVideoList(ArrayList<YoutubeCommentModel> mListData) {
-        mList_videos.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new CommentAdapter(this, mListData);
-        mList_videos.setAdapter(mAdapter);
-    }
-
-    public ArrayList<YoutubeCommentModel> parseJson(JSONObject jsonObject) {
-        ArrayList<YoutubeCommentModel> mList = new ArrayList<>();
-
-        if (jsonObject.has("items")) {
-            try {
-                JSONArray jsonArray = jsonObject.getJSONArray("items");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject json = jsonArray.getJSONObject(i);
-
-                    YoutubeCommentModel youtubeObject = new YoutubeCommentModel();
-                    JSONObject jsonTopLevelComment = json.getJSONObject("snippet").getJSONObject("topLevelComment");
-                    JSONObject jsonSnippet = jsonTopLevelComment.getJSONObject("snippet");
-
-                    String title = jsonSnippet.getString("authorDisplayName");
-                    String thumbnail = jsonSnippet.getString("authorProfileImageUrl");
-                    String comment = jsonSnippet.getString("textDisplay");
-
-                    youtubeObject.setTitle(title);
-                    youtubeObject.setComment(comment);
-                    youtubeObject.setThumbnail(thumbnail);
-                    mList.add(youtubeObject);
-
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return mList;
-
-    }
 
 
 

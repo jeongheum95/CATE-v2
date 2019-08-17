@@ -49,6 +49,14 @@ public interface RetrofitService {
             @Field("videoid") String videoid,
             @Field("target") String target
     );
+    @FormUrlEncoded
+    @POST("fow_updatecommentlikes.php")
+    Call<JsonObject> updatecommentlikes(
+            @Field("username") String username,
+            @Field("videoid") String videoid,
+            @Field("_index") String _index,
+            @Field("target") String target
+    );
 }
 
 
