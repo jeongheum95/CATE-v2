@@ -10,17 +10,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import app.com.CATE.interfaces.OnArrayClickListner;
 import app.com.youtubeapiv3.R;
 
 public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCategoryAdapter.ViewHolder> {
     private ArrayList<String> itemList;
     private Context context;
-    private View.OnClickListener onClickItem;
+    private OnArrayClickListner onArrayClickListner;
 
-    public HorizontalCategoryAdapter(Context context, ArrayList<String> itemList, View.OnClickListener onClickItem) {
+    public HorizontalCategoryAdapter(Context context, ArrayList<String> itemList, OnArrayClickListner onArrayClickListner) {
         this.context = context;
         this.itemList = itemList;
-        this.onClickItem = onClickItem;
+        this.onArrayClickListner = onArrayClickListner;
     }
 
 
@@ -36,11 +37,11 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String item = itemList.get(position);
+        final String item = itemList.get(position);
 
         holder.textview.setText(item);
 //        holder.textview.setTag(item);
-        holder.textview.setOnClickListener(onClickItem);
+        holder.bind(itemList.get(position), onArrayClickListner);
     }
 
     @Override
@@ -57,6 +58,15 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
             super(itemView);
 
             textview = (TextView) itemView.findViewById(R.id.category_textView);
+        }
+
+        public void bind(final String string, final OnArrayClickListner onArrayClickListner){
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onArrayClickListner.onArrayClick(string);
+                }
+            });
         }
     }
 }

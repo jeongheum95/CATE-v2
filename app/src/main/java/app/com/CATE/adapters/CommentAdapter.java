@@ -1,7 +1,6 @@
 package app.com.CATE.adapters;
 
 import android.content.Context;
-import android.nfc.Tag;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +8,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
 import app.com.CATE.DetailsActivity;
-import app.com.CATE.RetrofitService;
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.CATE.models.CommentModel;
 import app.com.youtubeapiv3.R;
 import retrofit2.Call;

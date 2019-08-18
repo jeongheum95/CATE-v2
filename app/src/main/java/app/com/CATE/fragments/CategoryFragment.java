@@ -11,13 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -28,10 +26,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.com.CATE.MainActivity;
-import app.com.CATE.RetrofitService;
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.CATE.adapters.CategoryAdapter;
 import app.com.CATE.models.CategoryModel;
 import app.com.CATE.models.YoutubeDataModel;
@@ -120,10 +120,58 @@ public class CategoryFragment extends ListFragment {
         if(mSelectedItems.get(position,false)){
             mSelectedItems.put(position,false);
             v.setBackgroundColor(Color.TRANSPARENT);
+
+            Map map = new HashMap();
+            map.put("index", position + "");
+            map.put("value", 0 + "");
+            map.put("user_name", mainActivity.strName);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(RetrofitService.URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RetrofitService retrofitService = retrofit.create(RetrofitService.class);
+
+            retrofitService.postCategory(map).enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+
+                }
+            });
+
         }
         else{
             mSelectedItems.put(position,true);
             v.setBackgroundColor(Color.LTGRAY);
+
+            Map map = new HashMap();
+            map.put("index", position + "");
+            map.put("value", 1 + "");
+            map.put("user_name", mainActivity.strName);
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(RetrofitService.URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RetrofitService retrofitService = retrofit.create(RetrofitService.class);
+
+            retrofitService.postCategory(map).enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+
+                }
+            });
+
         }
 
         mainActivity.PLAYLIST_ID = item.getKey();

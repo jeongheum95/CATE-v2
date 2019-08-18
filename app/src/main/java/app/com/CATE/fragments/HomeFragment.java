@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,14 +31,21 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.CATE.TwitchActivity;
 import app.com.CATE.adapters.HorizontalCategoryAdapter;
 import app.com.CATE.adapters.VideoPostAdapter;
 import app.com.CATE.DetailsActivity;
 import app.com.CATE.MainActivity;
+import app.com.CATE.interfaces.OnArrayClickListner;
 import app.com.youtubeapiv3.R;
 import app.com.CATE.interfaces.OnItemClickListener;
 import app.com.CATE.models.YoutubeDataModel;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -90,36 +99,59 @@ public class HomeFragment extends Fragment {
 
         userID = mainActivity.strName;
 
-        if (!mListData.isEmpty()) {
-            for (int i = 0; i < mListData.size(); i++) {
-                new RequestVideoThumbnail(i).execute();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(RetrofitService.URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitService retrofitService = retrofit.create(RetrofitService.class);
+        retrofitService.getCategory(mainActivity.strName).enqueue(new Callback<JsonArray>() {
+            @Override
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+
+                try {
+
+                    ArrayList<String> arrayList = new ArrayList<>();
+                    arrayList.add("전체");
+                    for(int i =0; i < response.body().size(); i++) {
+                        arrayList.add(response.body().get(i).getAsJsonObject().get("category_name").getAsString());
+                    }
+
+                    init(arrayList);
+
+                } catch (Exception e) {
+                }
             }
-        }
 
-//new RequestYoutubeAPI().execute();
-        init();//가로 카테고리 추가
+            @Override
+            public void onFailure(Call<JsonArray> call, Throwable t) {
+
+            }
+        });
 
 
-//spinner list 추가(fragment에서 추가하는 방식)
-// arrayListSort = new ArrayList<>();
-// arrayListSort.add("인기순");
-// arrayListSort.add("추천순");
-// arrayListSort.add("최신순");
+//        spinner list 추가(fragment에서 추가하는 방식)
+//        arrayListSort = new ArrayList<>();
+//        arrayListSort.add("인기순");
+//        arrayListSort.add("추천순");
+//        arrayListSort.add("최신순");
 //
-// arrayAdapterSort = new ArrayAdapter<>(getActivity(),
-// android.R.layout.simple_spinner_dropdown_item,
-// arrayListSort);
+//        arrayAdapterSort = new ArrayAdapter<>(getActivity(),
+//                android.R.layout.simple_spinner_dropdown_item,
+//                arrayListSort);
 //
-// spinnerSort = (Spinner) view.findViewById(R.id.spinnerSort);
-// spinnerSort.setAdapter(arrayAdapterSort);
-// spinnerSort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-// @Override
-// public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-// }
-// @Override
-// public void onNothingSelected(AdapterView<?> adapterView) {
-// }
-// });
+//        spinnerSort = (Spinner) view.findViewById(R.id.spinnerSort);
+//        spinnerSort.setAdapter(arrayAdapterSort);
+//        spinnerSort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//            }
+//        });
 
         return view;
     }
@@ -148,6 +180,65 @@ public class HomeFragment extends Fragment {
             }
         });
         mList_videos.setAdapter(adapter);
+    }
+
+    //가로 카테고리
+    private void init(ArrayList<String> arrayList) {
+
+        adapter2 = new HorizontalCategoryAdapter(getContext(), arrayList, new OnArrayClickListner(){
+            @Override
+            public void onArrayClick(String string) {
+                mListData = new ArrayList<>();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(RetrofitService.URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                RetrofitService retrofitService = retrofit.create(RetrofitService.class);
+                retrofitService.getCategoryVideo(string).enqueue(new Callback<JsonArray>() {
+                    @Override
+                    public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+
+                        for(int i=0; i < response.body().size(); i++) {
+                            JsonObject jsonObject = response.body().get(i).getAsJsonObject();
+
+                            String videoID = "";
+                            int videoIndex = Integer.parseInt(jsonObject.get("video_id").getAsString());
+                            String videoTitle = jsonObject.get("video_title").getAsString();
+                            String videoURL = jsonObject.get("video_url").getAsString();
+                            String videoKind = jsonObject.get("video_kind").getAsString();
+                            String thumbnail = jsonObject.get("thumbnail").getAsString();
+
+                            if (videoKind.equals("YOUTUBE")) {
+                                videoID = videoURL.substring(videoURL.indexOf("=") + 1);
+                            }
+                            if (videoKind.equals("TWITCH")) {
+                                String[] split = videoURL.split("/");
+                                videoID = split[split.length - 1];
+                            }
+
+                            YoutubeDataModel youtubeDataModel = new YoutubeDataModel();
+                            youtubeDataModel.setVideo_index(videoIndex);
+                            youtubeDataModel.setTitle(videoTitle);
+                            youtubeDataModel.setThumbnail(thumbnail);
+                            youtubeDataModel.setVideo_id(videoID);
+                            youtubeDataModel.setVideo_kind(videoKind);
+
+                            mListData.add(youtubeDataModel);
+                            initList(mListData);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<JsonArray> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+        listview2.setAdapter(adapter2);
+
     }
 
 
@@ -253,30 +344,6 @@ public class HomeFragment extends Fragment {
                 }
             }
         }
-    }
-
-    //가로 카테고리
-    private void init() {
-
-
-
-        ArrayList<String> itemList = new ArrayList<>();
-
-        itemList.add("0");
-        itemList.add("1");
-        itemList.add("2");
-        itemList.add("3");
-        itemList.add("4");
-        itemList.add("5");
-        itemList.add("6");
-        itemList.add("7");
-        itemList.add("8");
-        itemList.add("9");
-        itemList.add("10");
-
-        adapter2 = new HorizontalCategoryAdapter(getContext(), itemList, onClickItem);
-        listview2.setAdapter(adapter2);
-
     }
 
     private View.OnClickListener onClickItem = new View.OnClickListener() {

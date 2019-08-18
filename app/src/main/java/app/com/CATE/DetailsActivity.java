@@ -32,7 +32,6 @@ import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import app.com.CATE.adapters.CommentAdapter;
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.CATE.models.CommentModel;
 import app.com.CATE.models.YoutubeCommentModel;
 import app.com.CATE.models.YoutubeDataModel;

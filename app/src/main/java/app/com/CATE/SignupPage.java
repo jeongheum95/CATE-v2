@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
@@ -27,6 +26,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.youtubeapiv3.R;
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,21 +1,16 @@
 package app.com.CATE.fragments;
 
 
-import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -23,30 +18,16 @@ import android.widget.Toast;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 import app.com.CATE.DetailsActivity;
-import app.com.CATE.RetrofitService;
+import app.com.CATE.interfaces.RetrofitService;
 import app.com.CATE.TwitchActivity;
 import app.com.CATE.adapters.VideoPostAdapter;
 import app.com.CATE.interfaces.OnItemClickListener;
-import app.com.CATE.models.CategoryModel;
 import app.com.CATE.MainActivity;
 import app.com.CATE.models.YoutubeDataModel;
 import app.com.youtubeapiv3.R;
-import app.com.CATE.adapters.CategoryAdapter;
-import app.com.CATE.adapters.HorizontalCategoryAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
