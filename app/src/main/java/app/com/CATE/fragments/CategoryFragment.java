@@ -61,6 +61,8 @@ public class CategoryFragment extends ListFragment {
 
         All_category();
 
+
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -81,6 +83,7 @@ public class CategoryFragment extends ListFragment {
                     int count = 0;
 
                     String cateId, cateName, cateDetail, cateKey;
+                    Boolean cateState;
                     while (count < jsonArray.size()) {
                         JsonObject object = jsonArray.get(count).getAsJsonObject();
 
@@ -88,10 +91,13 @@ public class CategoryFragment extends ListFragment {
                         cateName = object.get("name").getAsString();
                         cateDetail = object.get("detail").getAsString();
                         cateKey = object.get("key").getAsString();
-
-                        CategoryModel CategoryModel = new CategoryModel(cateId, cateName, cateDetail, cateKey);
+                        cateState = true;
+                        if(cateState){
+                            mSelectedItems.put(count,true);
+                        }
+                        CategoryModel CategoryModel = new CategoryModel(cateId, cateName, cateDetail, cateKey, cateState);
                         categoryList.add(CategoryModel);
-                        adapter.addItem(cateId, cateName, cateDetail, cateKey);
+                        adapter.addItem(cateId, cateName, cateDetail, cateKey, cateState);
                         count++;
                     }
 
@@ -179,8 +185,8 @@ public class CategoryFragment extends ListFragment {
         // TODO : use item data.
     }
 
-    public void addItem(String icon, String title, String desc, String channel) {
-        adapter.addItem(icon, title, desc, channel);
+    public void addItem(String icon, String title, String desc, String channel, Boolean state) {
+        adapter.addItem(icon, title, desc, channel, state);
     }
 
 

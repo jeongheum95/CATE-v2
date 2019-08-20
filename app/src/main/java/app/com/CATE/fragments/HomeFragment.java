@@ -2,6 +2,7 @@ package app.com.CATE.fragments;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,10 +10,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.google.gson.JsonArray;
@@ -38,6 +41,7 @@ import app.com.CATE.adapters.VideoPostAdapter;
 import app.com.CATE.DetailsActivity;
 import app.com.CATE.MainActivity;
 import app.com.CATE.interfaces.OnArrayClickListner;
+import app.com.CATE.models.CategoryModel;
 import app.com.youtubeapiv3.R;
 import app.com.CATE.interfaces.OnItemClickListener;
 import app.com.CATE.models.YoutubeDataModel;
@@ -68,6 +72,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView listview2;
     private HorizontalCategoryAdapter adapter2;
 
+
+    private SparseBooleanArray mSelectedItems=new SparseBooleanArray(0);
     //spinner
     private Spinner spinnerSort;
     ArrayList<String> arrayListSort;
@@ -94,10 +100,12 @@ public class HomeFragment extends Fragment {
         PLAYLIST_GET_URL = mainActivity.PLAYLIST_GET_URL;
         mList_videos = (RecyclerView) view.findViewById(R.id.mList_videos);
         mListData = mainActivity.listData;
-        listview2 = (RecyclerView)view.findViewById(R.id.mList_horizontal_category);
+        listview2 = (RecyclerView) view.findViewById(R.id.mList_horizontal_category);
         initList(nListData);
 
+
         userID = mainActivity.strName;
+
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -180,6 +188,7 @@ public class HomeFragment extends Fragment {
             }
         });
         mList_videos.setAdapter(adapter);
+
     }
 
     //가로 카테고리
@@ -199,7 +208,6 @@ public class HomeFragment extends Fragment {
                 retrofitService.getCategoryVideo(string).enqueue(new Callback<JsonArray>() {
                     @Override
                     public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
-
                         for(int i=0; i < response.body().size(); i++) {
                             JsonObject jsonObject = response.body().get(i).getAsJsonObject();
 
@@ -237,6 +245,15 @@ public class HomeFragment extends Fragment {
                 });
             }
         });
+
+        adapter2.setOnItemClickListener(new HorizontalCategoryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick (View v,int position){
+                // TODO : 아이템 클릭 이벤트를 HomeFragment에서 처리.
+                v.setBackgroundColor(Color.LTGRAY);
+            }
+        });
+
         listview2.setAdapter(adapter2);
 
     }
@@ -349,6 +366,7 @@ public class HomeFragment extends Fragment {
     private View.OnClickListener onClickItem = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
         }
     };
 

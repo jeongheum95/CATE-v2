@@ -12,6 +12,7 @@ public class CategoryModel{
     private String name ;
     private String detail ;
     private String key ;
+    private Boolean state;
 
     public void setId(String id) {
         id = id ;
@@ -24,6 +25,9 @@ public class CategoryModel{
     }
     public void setKey(String key){
         key = key;
+    }
+    public void setState(Boolean state){
+        state = state;
     }
 
     public String getId() {
@@ -38,11 +42,16 @@ public class CategoryModel{
     public String getKey(){
         return this.key;
     }
-    public CategoryModel(String id, String name, String detail, String key) {
+    public Boolean getState(){
+        return this.state;
+    }
+
+    public CategoryModel(String id, String name, String detail, String key, Boolean state) {
         this.id = id;
         this.name = name;
         this.detail = detail;
         this.key = key;
+        this.state = state;
     }
 
 }

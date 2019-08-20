@@ -1,7 +1,9 @@
 package app.com.CATE.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
     private ArrayList<String> itemList;
     private Context context;
     private OnArrayClickListner onArrayClickListner;
+    private OnItemClickListener mListener = null ;
 
     public HorizontalCategoryAdapter(Context context, ArrayList<String> itemList, OnArrayClickListner onArrayClickListner) {
         this.context = context;
@@ -24,6 +27,13 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
         this.onArrayClickListner = onArrayClickListner;
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(View v, int position) ;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mListener = listener ;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -42,7 +52,9 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
         holder.textview.setText(item);
 //        holder.textview.setTag(item);
         holder.bind(itemList.get(position), onArrayClickListner);
+
     }
+
 
     @Override
     public int getItemCount() {
@@ -54,11 +66,27 @@ public class HorizontalCategoryAdapter extends RecyclerView.Adapter<HorizontalCa
 
         public TextView textview;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
 
             textview = (TextView) itemView.findViewById(R.id.category_textView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("aa","success");
+                    int pos = getAdapterPosition() ;
+                    if (pos != RecyclerView.NO_POSITION) {
+                        // 리스너 객체의 메서드 호출.
+                        if (mListener != null) {
+                            mListener.onItemClick(v, pos) ;
+                        }
+                    }
+                }
+            });
+
         }
+
 
         public void bind(final String string, final OnArrayClickListner onArrayClickListner){
             itemView.setOnClickListener(new View.OnClickListener() {

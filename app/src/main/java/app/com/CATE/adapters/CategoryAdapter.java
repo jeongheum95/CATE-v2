@@ -1,11 +1,13 @@
 package app.com.CATE.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -46,6 +48,7 @@ public class CategoryAdapter extends BaseAdapter {
         }
 
         // 화면에 표시될 View(Layout이 inflate된)으로부터 위젯에 대한 참조 획득
+        LinearLayout cate_list =  (LinearLayout)convertView.findViewById(R.id.list_category);
         ImageView cate_id = (ImageView) convertView.findViewById(R.id.text_id) ;
         TextView cate_name = (TextView) convertView.findViewById(R.id.text_name) ;
         TextView cate_detail = (TextView) convertView.findViewById(R.id.text_detail) ;
@@ -67,6 +70,11 @@ public class CategoryAdapter extends BaseAdapter {
         }
         cate_name.setText(listViewItem.getName());
         cate_detail.setText(listViewItem.getDetail());
+
+        if(listViewItem.getState()) {
+            cate_list.setBackgroundColor(Color.LTGRAY);
+        }
+
         return convertView;
     }
 
@@ -83,8 +91,8 @@ public class CategoryAdapter extends BaseAdapter {
     }
 
     // 아이템 데이터 추가를 위한 함수. 개발자가 원하는대로 작성 가능.
-    public void addItem(String id, String title, String desc, String channelId) {
-        CategoryModel item = new CategoryModel(id, title, desc, channelId);
+    public void addItem(String id, String title, String desc, String channelId, Boolean state) {
+        CategoryModel item = new CategoryModel(id, title, desc, channelId, state);
 
         item.setId(id);
         item.setName(title);
