@@ -8,6 +8,9 @@
     <string name="GOOGLE_YOUTUBE_API_KEY">AIzaSyDDNXQW5vUsBy91h_swoSAc_uFFAG14Clo</string>
     <string name="CHANNEL_ID">UCEgdi0XIXXZ-qJOFPf4JSKw</string>
     <string name="kakao_app_key">c0b31eee0a3442696e590addd4660ca7</string>
+    <string name="video_list_like">좋아요 표시한 영상</string>
+    <string name="video_list_dislike">싫어요 표시한 영상</string>
+    <string name="comment_list">내가 쓴 댓글</string>
     <string-array name="sortMenu">
         <item>인기순</item>
         <item>추천순</item>

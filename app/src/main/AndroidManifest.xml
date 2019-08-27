@@ -14,25 +14,41 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
+
         <activity android:name="app.com.CATE.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="app.com.CATE.DetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <activity android:name="app.com.CATE.SignupPage" />
+
         <activity android:name="app.com.CATE.SignupPage_API" />
+
         <activity android:name="app.com.CATE.MainActivity" />
+
+        <activity android:name="app.com.CATE.AccountActivity" />
+
         <activity
             android:name="app.com.CATE.TwitchActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name="app.com.CATE.AccountCommentListActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="app.com.CATE.AccountVideoListActivity"
+        android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_account: // 계정 버튼
                 Snackbar.make(toolbar, "Account menu pressed", Snackbar.LENGTH_SHORT).show();
+                Intent intentAccount = new Intent(MainActivity.this, AccountActivity.class) ;
+                startActivity(intentAccount) ;
                 return true;
             case R.id.menu_logout:// 로그아웃 버튼
                 Snackbar.make(toolbar, "Logout menu pressed", Snackbar.LENGTH_SHORT).show();
